@@ -74,6 +74,20 @@ if (loadRomBtn) {
   );
 }
 
+// Stats
+let fps: number = 0;
+let tps: number = 0;
+const statsElement = document.getElementById('lcd-stats');
+if (statsElement) {
+  const updateStats = () => {
+    statsElement.innerText = `FPS: ${fps}, CPU: ${(tps / CPU_CLOCK_FREQUENCY).toFixed(2)}Mhz`;
+    fps = 0;
+    tps = 0;
+  };
+
+  setInterval(updateStats, 1000);
+}
+
 // Handle keypresses
 const keyMap: { [index: number]: BUTTON } = {
   38: BUTTON.UP,
@@ -116,6 +130,7 @@ const gameLoop = (loopTime: number) => {
 
     for (let i = 0; i < ticks; i++) {
       system.tick();
+      tps++;
     }
   }
 
@@ -153,6 +168,7 @@ const gameLoop = (loopTime: number) => {
   }
 
   // Prepare for new frame
+  fps++;
   lastLoopTime = loopTime;
   requestAnimationFrame(gameLoop);
 };
