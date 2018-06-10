@@ -8,6 +8,7 @@ body {
   background: #201c2b;
   color: #eeeeee;
   font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+  font-size: 12px;
 }
 
 #main {
@@ -21,4 +22,15 @@ body {
   box-shadow: 2px 2px 5px -2px #000;
   margin-top: 10px;
   margin-bottom: 10px;
+}
+
+#github-link {
+  position: fixed;
+  bottom: 10px;
+  right: 10px;
+  display: block;
+  width: 32px;
+  height: 32px;
+  background: url('../assets/GitHub-Mark-Light-64px.png');
+  background-size: 32px 32px;
 }

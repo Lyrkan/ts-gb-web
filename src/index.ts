@@ -109,7 +109,11 @@ const gameLoop = (loopTime: number) => {
   if (gameRomLoaded && deltaTime) {
     // Run as many CPU ticks as needed based on the time
     // the previous frame took to process.
-    const ticks = (CPU_CLOCK_FREQUENCY * deltaTime) / 1000;
+    const ticks = Math.min(
+      (CPU_CLOCK_FREQUENCY * deltaTime) / 1000,
+      (CPU_CLOCK_FREQUENCY * 2)
+    );
+
     for (let i = 0; i < ticks; i++) {
       system.tick();
     }
