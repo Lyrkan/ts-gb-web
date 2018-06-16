@@ -28,6 +28,6 @@
     "uglifyjs-webpack-plugin": "^1.2.5"
   },
   "dependencies": {
-    "ts-gb": "^0.1.9"
+    "ts-gb": "^0.1.10"
   }
 }
