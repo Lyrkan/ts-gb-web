@@ -29,26 +29,77 @@ h1 {
   margin-top: 10px;
   margin-bottom: 10px;
 
-  &:hover #lcd-stats {
-    opacity: 1;
+  #lcd {
+    box-shadow: 2px 2px 5px -2px #000;
   }
 
-  #lcd-stats {
+  #lcd-stats, #lcd-controls {
     position: absolute;
-    top: 0;
     left: 0;
     right: 0;
     height: 30px;
     padding: 10px;
     opacity: 0;
-    background: linear-gradient(to bottom, rgba(0,0,0,0.65) 0%,rgba(0,0,0,0) 100%);
-    font-size: 11px;
     transition: opacity 0.3s linear;
     backface-visibility: hidden;
+    font-size: 11px;
+    line-height: 30px;
   }
 
-  #lcd {
-    box-shadow: 2px 2px 5px -2px #000;
+  &:hover #lcd-stats, &:hover #lcd-controls {
+    opacity: 1;
+  }
+
+  #lcd-stats {
+    top: 0;
+    padding: 10px;
+    background: linear-gradient(to bottom, rgba(0,0,0,0.65) 0%,rgba(0,0,0,0) 100%);
+  }
+
+  #lcd-controls {
+    bottom: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.65) 0%,rgba(0,0,0,0) 100%);
+
+    .control-button {
+      display: inline-block;
+      vertical-align: middle;
+      cursor: pointer;
+      border-color: rgba(255, 255, 255, 0.8);
+
+      &:hover {
+        border-color: #fff;
+      }
+    }
+
+    .play-button, .play-button:hover {
+      display: none;
+      width: 0;
+      height: 0;
+      border-top: 6px solid transparent;
+      border-bottom: 6px solid transparent;
+      border-left-width: 9px;
+      border-left-style: solid;
+      margin-left: 3px;
+    }
+
+    .pause-button, .pause-button:hover {
+      width: 3px;
+      height: 11px;
+      border-right-width: 3px;
+      border-right-style: solid;
+      border-left-width: 3px;
+      border-left-style: solid;
+    }
+
+    &.state-paused {
+      .play-button {
+        display: inline-block;
+      }
+
+      .pause-button {
+        display: none;
+      }
+    }
   }
 }
 

@@ -2,6 +2,12 @@ import { System } from 'ts-gb/dist/system';
 import { SCREEN_WIDTH, SCREEN_HEIGHT } from 'ts-gb/dist/display/display';
 import { BUTTON } from 'ts-gb/dist/controls/joypad';
 
+// Not sure why a basic "import swal from 'sweetalert'"
+// ends up being undefined...
+import * as _swal from 'sweetalert';
+import { SweetAlert } from 'sweetalert/typings/core';
+const swal: SweetAlert = _swal as any;
+
 const WINDOW_SCALING = 3;
 const CPU_CLOCK_FREQUENCY = 1024 * 1024;
 const COLOR_OFF_SCREEN = '#A7BC4D';
@@ -34,6 +40,7 @@ canvasContext.fillRect(0, 0, SCREEN_WIDTH * WINDOW_SCALING, SCREEN_HEIGHT * WIND
 
 // Status flags
 let gameRomLoaded = false;
+let emulationPaused = false;
 
 // Handle file loads
 const createFileSelectListener = (type: string) => (event: Event) => {
@@ -43,14 +50,18 @@ const createFileSelectListener = (type: string) => (event: Event) => {
     reader.onload = ((file: File) => (e: any) => {
       const fileData = e.target.result;
 
-      switch (type) {
-        case 'bootrom':
-          system.loadBootRom(fileData);
-          break;
-        case 'rom':
-          system.loadGame(fileData);
-          gameRomLoaded = true;
-          break;
+      try {
+        switch (type) {
+          case 'bootrom':
+            system.loadBootRom(fileData);
+            break;
+          case 'rom':
+            system.loadGame(fileData);
+            gameRomLoaded = true;
+            break;
+        }
+      } catch (e) {
+        swal('Oops!', `Could not load "${file.name}":\n${e}`, 'error');
       }
     })(files[0]);
 
@@ -88,6 +99,26 @@ if (statsElement) {
   setInterval(updateStats, 1000);
 }
 
+// Controls
+const toggleEmulation = () => {
+  emulationPaused = !emulationPaused;
+
+  const controlsElt = document.getElementById('lcd-controls');
+  if (controlsElt) {
+    controlsElt.classList.toggle('state-paused', emulationPaused);
+  }
+};
+
+const playButton = document.querySelector('#lcd-controls .play-button');
+if (playButton) {
+  playButton.addEventListener('click', toggleEmulation);
+}
+
+const pauseButton = document.querySelector('#lcd-controls .pause-button');
+if (pauseButton) {
+  pauseButton.addEventListener('click', toggleEmulation);
+}
+
 // Handle keypresses
 const keyMap: { [index: number]: BUTTON } = {
   38: BUTTON.UP,
@@ -120,7 +151,7 @@ const gameLoop = (loopTime: number) => {
     deltaTime = loopTime - lastLoopTime;
   }
 
-  if (gameRomLoaded && deltaTime) {
+  if (gameRomLoaded && !emulationPaused && deltaTime) {
     // Run as many CPU ticks as needed based on the time
     // the previous frame took to process.
     const ticks = Math.min(
@@ -128,9 +159,14 @@ const gameLoop = (loopTime: number) => {
       CPU_CLOCK_FREQUENCY
     );
 
-    for (let i = 0; i < ticks; i++) {
-      system.tick();
-      tps++;
+    try {
+      for (let i = 0; i < ticks; i++) {
+        system.tick();
+        tps++;
+      }
+    } catch (e) {
+      swal('Oops!', `An error occured:\n${e}`, 'error');
+      emulationPaused = true;
     }
   }
 
