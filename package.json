@@ -28,7 +28,7 @@
     "uglifyjs-webpack-plugin": "^1.2.5"
   },
   "dependencies": {
-    "sweetalert": "^2.1.0",
+    "sweetalert2": "^7.22.2",
     "ts-gb": "^0.2.1"
   }
 }

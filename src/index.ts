@@ -1,12 +1,7 @@
 import { System } from 'ts-gb/dist/system';
 import { SCREEN_WIDTH, SCREEN_HEIGHT } from 'ts-gb/dist/display/display';
 import { BUTTON } from 'ts-gb/dist/controls/joypad';
-
-// Not sure why a basic "import swal from 'sweetalert'"
-// ends up being undefined...
-import * as _swal from 'sweetalert';
-import { SweetAlert } from 'sweetalert/typings/core';
-const swal: SweetAlert = _swal as any;
+import Swal from 'sweetalert2';
 
 const WINDOW_SCALING = 3;
 const CPU_CLOCK_FREQUENCY = 1024 * 1024;
@@ -61,7 +56,11 @@ const createFileSelectListener = (type: string) => (event: Event) => {
             break;
         }
       } catch (e) {
-        swal('Oops!', `Could not load "${file.name}":\n${e}`, 'error');
+        Swal({
+          type: 'error',
+          title: 'Oops!',
+          html: `Could not load <strong>${file.name}</strong>:<br>${e}`,
+        });
       }
     })(files[0]);
 
@@ -100,8 +99,8 @@ if (statsElement) {
 }
 
 // Controls
-const toggleEmulation = () => {
-  emulationPaused = !emulationPaused;
+const setEmulationPaused = (paused: boolean) => {
+  emulationPaused = paused;
 
   const controlsElt = document.getElementById('lcd-controls');
   if (controlsElt) {
@@ -111,12 +110,12 @@ const toggleEmulation = () => {
 
 const playButton = document.querySelector('#lcd-controls .play-button');
 if (playButton) {
-  playButton.addEventListener('click', toggleEmulation);
+  playButton.addEventListener('click', () => setEmulationPaused(false));
 }
 
 const pauseButton = document.querySelector('#lcd-controls .pause-button');
 if (pauseButton) {
-  pauseButton.addEventListener('click', toggleEmulation);
+  pauseButton.addEventListener('click', () => setEmulationPaused(true));
 }
 
 // Handle keypresses
@@ -165,8 +164,14 @@ const gameLoop = (loopTime: number) => {
         tps++;
       }
     } catch (e) {
-      swal('Oops!', `An error occured:\n${e}`, 'error');
-      emulationPaused = true;
+      Swal({
+        type: 'error',
+        title: 'Oops!',
+        text: `An error occured:\n${e}`,
+        // tslint:disable-next-line
+        footer: '<a href="https://github.com/Lyrkan/ts-gb/issues" target="_blank">Open an issue on Github</a>'
+      });
+      setEmulationPaused(true);
     }
   }
 
