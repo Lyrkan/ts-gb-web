@@ -29,6 +29,6 @@
   },
   "dependencies": {
     "sweetalert2": "^7.22.2",
-    "ts-gb": "^0.2.1"
+    "ts-gb": "^0.2.2"
   }
 }
