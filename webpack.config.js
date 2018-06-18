@@ -20,12 +20,12 @@ Encore
 const webpackConfig = Encore.getWebpackConfig();
 
 // Remove the old version first
-webpackConfig.plugins = webpackConfig.plugins.filter((plugin) => {
+webpackConfig.plugins = webpackConfig.plugins.map((plugin) => {
   if (plugin instanceof webpack.optimize.UglifyJsPlugin) {
-    return false;// new UglifyJsPlugin();
+    return new UglifyJsPlugin();
   }
 
-  return true;//plugin;
+  return plugin;
 });
 
 // Add the new one
