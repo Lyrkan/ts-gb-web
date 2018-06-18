@@ -24,9 +24,18 @@ h1 {
   transform: translateX(-50%) translateY(-50%);
 }
 
+#logo {
+  display: block;
+  height: 76px;
+  background: url('../assets/ts-gb.png');
+  background-repeat: no-repeat;
+  background-position: center center;
+}
+
 #lcd-container {
   position: relative;
-  margin-top: 10px;
+  display: inline-block;
+  margin-top: 20px;
   margin-bottom: 10px;
 
   #lcd {

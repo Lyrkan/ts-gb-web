@@ -6,7 +6,8 @@
   </head>
   <body>
     <div id="main">
-      <h1>TS-GB</h1>
+      <div id="logo"></div>
+
       <div id="lcd-container">
         <div id="lcd-stats"></div>
         <div id="lcd-controls">
@@ -15,8 +16,16 @@
         </div>
         <canvas id="lcd"></canvas>
       </div>
-      Load a boot ROM (optional): <input id="load-bootrom-btn" type="file" accept=".bin"><br>
-      Load a game: <input id="load-rom-btn" type="file" accept=".gb">
+
+      <br>
+
+      <label for="load-bootrom-btn">Load a boot ROM (optional): </label>
+      <input id="load-bootrom-btn" type="file" accept=".bin">
+
+      <br>
+
+      <label for="load-rom-btn">Load a game: </label>
+      <input id="load-rom-btn" type="file" accept=".gb">
     </div>
 
     <a id="github-link" href="https://github.com/Lyrkan/ts-gb/" title="Github" target="_blank"></a>
