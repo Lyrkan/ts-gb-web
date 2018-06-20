@@ -49,11 +49,25 @@ const createFileSelectListener = (type: string) => (event: Event) => {
         switch (type) {
           case 'bootrom':
             system.loadBootRom(fileData);
+            Swal({
+              type: 'info',
+              toast: true,
+              position: 'top-end',
+              text: 'Bootstrap ROM has been loaded successfuly',
+              timer: 3000,
+            });
             break;
           case 'rom':
             system.loadGame(fileData);
             gameRomLoaded = true;
             setEmulationPaused(false);
+            Swal({
+              type: 'info',
+              toast: true,
+              position: 'top-end',
+              text: `ROM has been loaded successfuly:  ${file.name}`,
+              timer: 3000,
+            });
             break;
         }
       } catch (e) {
