@@ -53,6 +53,7 @@ const createFileSelectListener = (type: string) => (event: Event) => {
           case 'rom':
             system.loadGame(fileData);
             gameRomLoaded = true;
+            setEmulationPaused(false);
             break;
         }
       } catch (e) {
