@@ -172,6 +172,7 @@ const gameLoop = (loopTime: number) => {
         // tslint:disable-next-line
         footer: '<a href="https://github.com/Lyrkan/ts-gb/issues" target="_blank">Open an issue on Github</a>'
       });
+      console.error(e); // tslint:disable-line:no-console
       setEmulationPaused(true);
     }
   }
