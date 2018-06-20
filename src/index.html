@@ -17,15 +17,13 @@
         <canvas id="lcd"></canvas>
       </div>
 
-      <br>
+       <div id="load-files-container">
+        <label class="load-button" for="load-bootrom-btn">Load a boot ROM (optional)</label>
+        <label class="load-button" for="load-rom-btn">Load a game</label>
 
-      <label for="load-bootrom-btn">Load a boot ROM (optional): </label>
-      <input id="load-bootrom-btn" type="file" accept=".bin">
-
-      <br>
-
-      <label for="load-rom-btn">Load a game: </label>
-      <input id="load-rom-btn" type="file" accept=".gb">
+        <input id="load-bootrom-btn" type="file" accept=".bin">
+        <input id="load-rom-btn" type="file" accept=".gb">
+      </div>
     </div>
 
     <a id="github-link" href="https://github.com/Lyrkan/ts-gb/" title="Github" target="_blank"></a>

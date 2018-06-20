@@ -112,6 +112,32 @@ h1 {
   }
 }
 
+#load-files-container {
+  text-align: center;
+
+  input[type="file"] {
+    display: none;
+  }
+
+  .load-button {
+    display: inline-block;
+    width: 200px;
+    padding-top: 8px;
+    padding-bottom: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.1s linear;
+
+    &:not(:last-child) {
+      margin-right: 10px;
+    }
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+  }
+}
+
 #github-link {
   position: fixed;
   bottom: 10px;
