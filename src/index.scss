@@ -65,7 +65,7 @@ h1 {
   }
 
   #lcd-controls {
-    bottom: 0;
+    bottom: 2px;
     background: linear-gradient(to top, rgba(0,0,0,0.65) 0%,rgba(0,0,0,0) 100%);
 
     .control-button {
@@ -153,4 +153,9 @@ h1 {
   color: #2196f3;
   font-weight: 600;
   cursor: pointer;
+}
+
+.swal2-popup.swal2-toast.swal2-show {
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: none;
 }
