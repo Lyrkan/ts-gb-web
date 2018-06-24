@@ -158,18 +158,21 @@ window.addEventListener('keyup', event => {
 });
 
 // Game loop
+const imageDataBuffer = new Uint8ClampedArray(4 * SCREEN_WIDTH * SCREEN_HEIGHT);
+const imageData = new ImageData(imageDataBuffer, SCREEN_WIDTH, SCREEN_HEIGHT);
 let lastLoopTime: number|null = null;
+
 const gameLoop = (loopTime: number) => {
-  let deltaTime: number|null = null;
+  let deltaLoopTime: number|null = null;
   if (lastLoopTime != null) {
-    deltaTime = loopTime - lastLoopTime;
+    deltaLoopTime = loopTime - lastLoopTime;
   }
 
-  if (gameRomLoaded && !emulationPaused && deltaTime) {
+  if (gameRomLoaded && !emulationPaused && deltaLoopTime) {
     // Run as many CPU ticks as needed based on the time
     // the previous frame took to process.
     const ticks = Math.min(
-      (CPU_CLOCK_FREQUENCY * deltaTime) / 1000,
+      (CPU_CLOCK_FREQUENCY * deltaLoopTime) / 1000,
       CPU_CLOCK_FREQUENCY
     );
 
@@ -195,13 +198,9 @@ const gameLoop = (loopTime: number) => {
     // Draw buffer
     const buffer = system.display.getFrontBuffer();
 
-    const imageDataBuffer = new Uint8ClampedArray(4 * SCREEN_WIDTH * SCREEN_HEIGHT);
-
     for (let line = 0; line < SCREEN_HEIGHT; line++) {
       for (let column = 0; column < SCREEN_WIDTH; column++) {
-        const colorIndex = buffer[line * SCREEN_WIDTH + column];
-        const color = COLOR_PALETTE[colorIndex];
-
+        const color = COLOR_PALETTE[buffer[line * SCREEN_WIDTH + column]];
         if (color) {
           const startIndex = (line * SCREEN_WIDTH * 4) + (column * 4);
           imageDataBuffer[startIndex] = color[0];
@@ -212,7 +211,6 @@ const gameLoop = (loopTime: number) => {
       }
     }
 
-    const imageData = new ImageData(imageDataBuffer, SCREEN_WIDTH, SCREEN_HEIGHT);
     createImageBitmap(imageData).then(bitmap => {
       canvasContext.drawImage(
         bitmap,
