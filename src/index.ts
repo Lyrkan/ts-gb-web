@@ -2,10 +2,21 @@ import { System } from 'ts-gb/dist/system';
 import { SCREEN_WIDTH, SCREEN_HEIGHT } from 'ts-gb/dist/display/display';
 import { BUTTON } from 'ts-gb/dist/controls/joypad';
 import Swal from 'sweetalert2';
+import {
+  Scene,
+  OrthographicCamera,
+  WebGLRenderer,
+  DataTexture,
+  RGBFormat,
+  PlaneGeometry,
+  MeshBasicMaterial,
+  Mesh
+} from 'three';
 
-const WINDOW_SCALING = 3;
+const SCALED_SCREEN_WIDTH = SCREEN_WIDTH * 3;
+const SCALED_SCREEN_HEIGHT = SCREEN_HEIGHT * 3;
 const CPU_CLOCK_FREQUENCY = 1024 * 1024;
-const COLOR_OFF_SCREEN = '#A7BC4D';
+const COLOR_DISABLED_SCREEN = [167, 188, 77];
 const COLOR_PALETTE = [
   [155, 188, 15],
   [139, 172, 75],
@@ -18,20 +29,24 @@ const COLOR_PALETTE = [
 const system = new System();
 
 // Find the canvas that represents the LCD screen
-const canvas = document.getElementById('lcd');
-const canvasContext = canvas ? (canvas as HTMLCanvasElement).getContext('2d') : null;
-if (!canvas || !canvasContext) {
-  throw new Error('Could not find LCD canvas');
-}
+const scene = new Scene();
+const camera = new OrthographicCamera(
+  SCALED_SCREEN_WIDTH / -2,
+  SCALED_SCREEN_WIDTH / 2,
+  SCALED_SCREEN_HEIGHT / 2,
+  SCALED_SCREEN_HEIGHT / -2,
+  -1,
+  1
+);
 
-// Initialize canvas options
-canvas.style.width = `${SCREEN_WIDTH * WINDOW_SCALING}px` ;
-canvas.style.height = `${SCREEN_HEIGHT * WINDOW_SCALING}px` ;
-canvasContext.canvas.width = SCREEN_WIDTH * WINDOW_SCALING;
-canvasContext.canvas.height = SCREEN_HEIGHT * WINDOW_SCALING;
-canvasContext.imageSmoothingEnabled = false;
-canvasContext.fillStyle = COLOR_OFF_SCREEN;
-canvasContext.fillRect(0, 0, SCREEN_WIDTH * WINDOW_SCALING, SCREEN_HEIGHT * WINDOW_SCALING);
+const renderer = new WebGLRenderer();
+renderer.setSize(SCALED_SCREEN_WIDTH, SCALED_SCREEN_HEIGHT);
+
+// Append the renderer to the LCD container
+const lcdContainer = document.getElementById('lcd-container');
+if (lcdContainer !== null) {
+  lcdContainer.appendChild(renderer.domElement);
+}
 
 // Status flags
 let gameRomLoaded = false;
@@ -157,9 +172,29 @@ window.addEventListener('keyup', event => {
   }
 });
 
+// Prepare scene
+const screenDataBuffer = new Uint8Array(3 * SCREEN_WIDTH * SCREEN_HEIGHT);
+for (let line = 0; line < SCREEN_HEIGHT; line++) {
+  for (let column = 0; column < SCREEN_WIDTH; column++) {
+    const startIndex = (line * SCREEN_WIDTH * 3) + (column * 3);
+    screenDataBuffer[startIndex] = COLOR_DISABLED_SCREEN[0];
+    screenDataBuffer[startIndex + 1] = COLOR_DISABLED_SCREEN[1];
+    screenDataBuffer[startIndex + 2] = COLOR_DISABLED_SCREEN[2];
+  }
+}
+
+const screenTexture = new DataTexture(screenDataBuffer, SCREEN_WIDTH, SCREEN_HEIGHT, RGBFormat);
+screenTexture.flipY = true;
+screenTexture.needsUpdate = true;
+
+const screenMesh = new Mesh(
+  new PlaneGeometry(SCALED_SCREEN_WIDTH, SCALED_SCREEN_HEIGHT),
+  new MeshBasicMaterial({ map: screenTexture })
+);
+
+scene.add(screenMesh);
+
 // Game loop
-const imageDataBuffer = new Uint8ClampedArray(4 * SCREEN_WIDTH * SCREEN_HEIGHT);
-const imageData = new ImageData(imageDataBuffer, SCREEN_WIDTH, SCREEN_HEIGHT);
 let lastLoopTime: number|null = null;
 
 const gameLoop = (loopTime: number) => {
@@ -202,25 +237,19 @@ const gameLoop = (loopTime: number) => {
       for (let column = 0; column < SCREEN_WIDTH; column++) {
         const color = COLOR_PALETTE[buffer[line * SCREEN_WIDTH + column]];
         if (color) {
-          const startIndex = (line * SCREEN_WIDTH * 4) + (column * 4);
-          imageDataBuffer[startIndex] = color[0];
-          imageDataBuffer[startIndex + 1] = color[1];
-          imageDataBuffer[startIndex + 2] = color[2];
-          imageDataBuffer[startIndex + 3] = 255;
+          const startIndex = (line * SCREEN_WIDTH * 3) + (column * 3);
+          screenDataBuffer[startIndex] = color[0];
+          screenDataBuffer[startIndex + 1] = color[1];
+          screenDataBuffer[startIndex + 2] = color[2];
         }
       }
     }
 
-    createImageBitmap(imageData).then(bitmap => {
-      canvasContext.drawImage(
-        bitmap,
-        0,
-        0,
-        SCREEN_WIDTH * WINDOW_SCALING,
-        SCREEN_HEIGHT * WINDOW_SCALING
-      );
-    });
+    screenTexture.needsUpdate = true;
   }
+
+  // Render current frame
+  renderer.render(scene, camera);
 
   // Prepare for new frame
   fps++;

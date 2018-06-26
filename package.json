@@ -28,7 +28,9 @@
     "uglifyjs-webpack-plugin": "^1.2.5"
   },
   "dependencies": {
+    "@types/three": "^0.92.8",
     "sweetalert2": "^7.22.2",
+    "three": "^0.93.0",
     "ts-gb": "^0.2.6"
   }
 }
