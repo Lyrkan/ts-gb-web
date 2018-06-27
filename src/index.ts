@@ -1,7 +1,9 @@
+import 'babel-polyfill';
 import { System } from 'ts-gb/dist/system';
 import { SCREEN_WIDTH, SCREEN_HEIGHT } from 'ts-gb/dist/display/display';
 import { BUTTON } from 'ts-gb/dist/controls/joypad';
-import Swal from 'sweetalert2';
+import { Database } from './database';
+import * as Alerts from './alerts';
 
 const WINDOW_SCALING = 3;
 const CPU_CLOCK_FREQUENCY = 1024 * 1024;
@@ -13,18 +15,20 @@ const COLOR_PALETTE = [
   [15, 56, 15],
 ];
 
-// Create the system object which contains
-// the CPU/MMU/...
+// ------
+// Initialize all components
+// ------
 const system = new System();
 
-// Find the canvas that represents the LCD screen
+// ------
+// Initialize canvas options
+// ------
 const canvas = document.getElementById('lcd');
 const canvasContext = canvas ? (canvas as HTMLCanvasElement).getContext('2d') : null;
 if (!canvas || !canvasContext) {
   throw new Error('Could not find LCD canvas');
 }
 
-// Initialize canvas options
 canvas.style.width = `${SCREEN_WIDTH * WINDOW_SCALING}px` ;
 canvas.style.height = `${SCREEN_HEIGHT * WINDOW_SCALING}px` ;
 canvasContext.canvas.width = SCREEN_WIDTH * WINDOW_SCALING;
@@ -33,11 +37,45 @@ canvasContext.imageSmoothingEnabled = false;
 canvasContext.fillStyle = COLOR_OFF_SCREEN;
 canvasContext.fillRect(0, 0, SCREEN_WIDTH * WINDOW_SCALING, SCREEN_HEIGHT * WINDOW_SCALING);
 
+// ------
 // Status flags
+// ------
 let gameRomLoaded = false;
 let emulationPaused = false;
 
+// ------
 // Handle file loads
+// ------
+const database = new Database();
+const loadGame = async (filename: string, buffer: ArrayBuffer) => {
+  system.loadGame(buffer);
+
+  if (system.cartridge.cartridgeInfo.hasBattery) {
+    // Add save handler
+    let saveDebounce: any = null;
+    system.cartridge.setRamChangedListener(() => {
+      if (saveDebounce !== null) {
+        clearTimeout(saveDebounce);
+      }
+
+      saveDebounce = setTimeout(() => {
+        const ramContent = system.cartridge.getRamContent();
+        database.saveGame(filename, ramContent).finally(() => {
+          saveDebounce = null;
+        });
+      }, 500);
+    });
+
+    // Load previous save if there is one
+    try {
+      await database.loadGameSave(filename, system.cartridge);
+    } catch (e) {
+      Alerts.displayError(`Could not load save file: ${e}`);
+      console.error(e); // tslint:disable-line:no-console
+    }
+  }
+};
+
 const createFileSelectListener = (type: string) => (event: Event) => {
   const files =  (event.target as HTMLInputElement).files;
   if (files && files[0]) {
@@ -49,33 +87,19 @@ const createFileSelectListener = (type: string) => (event: Event) => {
         switch (type) {
           case 'bootrom':
             system.loadBootRom(fileData);
-            Swal({
-              type: 'info',
-              toast: true,
-              position: 'top-end',
-              text: 'Bootstrap ROM has been loaded successfuly',
-              timer: 3000,
-            });
+            Alerts.displayToast('Bootstrap ROM has been loaded successfuly');
             break;
           case 'rom':
-            system.loadGame(fileData);
-            gameRomLoaded = true;
-            setEmulationPaused(false);
-            Swal({
-              type: 'info',
-              toast: true,
-              position: 'top-end',
-              text: `ROM has been loaded successfuly:  ${file.name}`,
-              timer: 3000,
+            loadGame(file.name, fileData).then(() => {
+              gameRomLoaded = true;
+              setEmulationPaused(false);
+              Alerts.displayToast(`ROM has been loaded successfuly: <strong>${file.name}</strong>`);
             });
             break;
         }
       } catch (e) {
-        Swal({
-          type: 'error',
-          title: 'Oops!',
-          html: `Could not load <strong>${file.name}</strong>:<br>${e}`,
-        });
+        Alerts.displayError(`Could not load <strong>${file.name}</strong>:<br>${e}`);
+        console.error(e); // tslint:disable-line:no-console
       }
     })(files[0]);
 
@@ -99,7 +123,9 @@ if (loadRomBtn) {
   );
 }
 
+// ------
 // Stats
+// ------
 let fps: number = 0;
 let tps: number = 0;
 const statsElement = document.getElementById('lcd-stats');
@@ -113,7 +139,9 @@ if (statsElement) {
   setInterval(updateStats, 1000);
 }
 
+// ------
 // Controls
+// ------
 const setEmulationPaused = (paused: boolean) => {
   emulationPaused = paused;
 
@@ -133,7 +161,6 @@ if (pauseButton) {
   pauseButton.addEventListener('click', () => setEmulationPaused(true));
 }
 
-// Handle keypresses
 const keyMap: { [index: number]: BUTTON } = {
   38: BUTTON.UP,
   40: BUTTON.DOWN,
@@ -157,7 +184,9 @@ window.addEventListener('keyup', event => {
   }
 });
 
+// ------
 // Game loop
+// ------
 const imageDataBuffer = new Uint8ClampedArray(4 * SCREEN_WIDTH * SCREEN_HEIGHT);
 const imageData = new ImageData(imageDataBuffer, SCREEN_WIDTH, SCREEN_HEIGHT);
 let lastLoopTime: number|null = null;
@@ -182,13 +211,7 @@ const gameLoop = (loopTime: number) => {
         tps++;
       }
     } catch (e) {
-      Swal({
-        type: 'error',
-        title: 'Oops!',
-        text: `An error occured:\n${e}`,
-        // tslint:disable-next-line
-        footer: '<a href="https://github.com/Lyrkan/ts-gb/issues" target="_blank">Open an issue on Github</a>'
-      });
+      Alerts.displayError(`Runtime error: ${e}`);
       console.error(e); // tslint:disable-line:no-console
       setEmulationPaused(true);
     }
