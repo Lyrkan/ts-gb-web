@@ -47,6 +47,11 @@ let emulationPaused = false;
 // Handle file loads
 // ------
 const database = new Database();
+
+const loadBootRom = async (buffer: ArrayBuffer) => {
+  system.loadBootRom(buffer);
+};
+
 const loadGame = async (filename: string, buffer: ArrayBuffer) => {
   system.loadGame(buffer);
 
@@ -82,24 +87,25 @@ const createFileSelectListener = (type: string) => (event: Event) => {
     const reader = new FileReader();
     reader.onload = ((file: File) => (e: any) => {
       const fileData = e.target.result;
-
-      try {
-        switch (type) {
-          case 'bootrom':
-            system.loadBootRom(fileData);
+      switch (type) {
+        case 'bootrom':
+          loadBootRom(fileData).then(() => {
             Alerts.displayToast('Bootstrap ROM has been loaded successfuly');
-            break;
-          case 'rom':
-            loadGame(file.name, fileData).then(() => {
-              gameRomLoaded = true;
-              setEmulationPaused(false);
-              Alerts.displayToast(`ROM has been loaded successfuly: <strong>${file.name}</strong>`);
-            });
-            break;
-        }
-      } catch (e) {
-        Alerts.displayError(`Could not load <strong>${file.name}</strong>:<br>${e}`);
-        console.error(e); // tslint:disable-line:no-console
+          }).catch(error => {
+            Alerts.displayError(`Could not load ROM <strong>${file.name}</strong>:<br>${error}`);
+            console.error(error); // tslint:disable-line:no-console
+          });
+          break;
+        case 'rom':
+          loadGame(file.name, fileData).then(() => {
+            gameRomLoaded = true;
+            setEmulationPaused(false);
+            Alerts.displayToast(`ROM has been loaded successfuly: <strong>${file.name}</strong>`);
+          }).catch(error => {
+            Alerts.displayError(`Could not load game <strong>${file.name}</strong>:<br>${error}`);
+            console.error(error); // tslint:disable-line:no-console
+          });
+          break;
       }
     })(files[0]);
 

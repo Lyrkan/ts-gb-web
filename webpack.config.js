@@ -2,6 +2,7 @@ const Encore = require('@symfony/webpack-encore');
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
+const FaviconsWebpackPlugin = require('favicons-webpack-plugin')
 
 Encore
   .setOutputPath('build/')
@@ -12,9 +13,8 @@ Encore
   .enableSassLoader()
   .enableTypeScriptLoader()
   .enableVersioning()
-  .addPlugin(new HtmlWebpackPlugin({
-    template: 'src/index.html'
-  }))
+  .addPlugin(new HtmlWebpackPlugin({ template: 'src/index.html'}))
+  .addPlugin(new FaviconsWebpackPlugin('./assets/favicon.png'))
 ;
 
 const webpackConfig = Encore.getWebpackConfig();
