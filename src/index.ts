@@ -7,12 +7,12 @@ import * as Alerts from './alerts';
 
 const WINDOW_SCALING = 3;
 const CPU_CLOCK_FREQUENCY = 1024 * 1024;
-const COLOR_OFF_SCREEN = '#A7BC4D';
+const COLOR_OFF_SCREEN = '#5AC1A1';
 const COLOR_PALETTE = [
-  [155, 188, 15],
-  [139, 172, 75],
-  [48, 98, 48],
-  [15, 56, 15],
+  [34, 196, 149],
+  [87, 179, 165],
+  [58, 80, 105],
+  [25, 44, 64],
 ];
 
 // ------
