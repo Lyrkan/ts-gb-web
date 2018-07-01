@@ -7,13 +7,7 @@ import * as Alerts from './alerts';
 
 const WINDOW_SCALING = 3;
 const CPU_CLOCK_FREQUENCY = 1024 * 1024;
-const COLOR_OFF_SCREEN = '#5AC1A1';
-const COLOR_PALETTE = [
-  [34, 196, 149],
-  [87, 179, 165],
-  [58, 80, 105],
-  [25, 44, 64],
-];
+const COLOR_OFF_SCREEN = '#EEEEEE';
 
 // ------
 // Initialize all components
@@ -229,14 +223,11 @@ const gameLoop = (loopTime: number) => {
 
     for (let line = 0; line < SCREEN_HEIGHT; line++) {
       for (let column = 0; column < SCREEN_WIDTH; column++) {
-        const color = COLOR_PALETTE[buffer[line * SCREEN_WIDTH + column]];
-        if (color) {
-          const startIndex = (line * SCREEN_WIDTH * 4) + (column * 4);
-          imageDataBuffer[startIndex] = color[0];
-          imageDataBuffer[startIndex + 1] = color[1];
-          imageDataBuffer[startIndex + 2] = color[2];
-          imageDataBuffer[startIndex + 3] = 255;
-        }
+        const startIndex = (line * SCREEN_WIDTH * 4) + (column * 4);
+        imageDataBuffer[startIndex] = buffer[(line * SCREEN_WIDTH * 3) + (column * 3)];
+        imageDataBuffer[startIndex + 1] = buffer[(line * SCREEN_WIDTH * 3) + (column * 3) + 1];
+        imageDataBuffer[startIndex + 2] = buffer[(line * SCREEN_WIDTH * 3) + (column * 3) + 2];
+        imageDataBuffer[startIndex + 3] = 255;
       }
     }
 
