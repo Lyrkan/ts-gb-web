@@ -33,6 +33,6 @@
     "babel-polyfill": "^6.26.0",
     "dexie": "^2.0.4",
     "sweetalert2": "^7.22.2",
-    "ts-gb": "^0.5.0"
+    "ts-gb": "^0.5.1"
   }
 }

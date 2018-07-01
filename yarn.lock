@@ -6181,9 +6181,9 @@ trim@0.0.1:
   dependencies:
     glob "^6.0.4"
 
-ts-gb@^0.5.0:
-  version "0.5.0"
-  resolved "https://registry.yarnpkg.com/ts-gb/-/ts-gb-0.5.0.tgz#4f903009b1826025c904d3091cc774688ec85530"
+ts-gb@^0.5.1:
+  version "0.5.1"
+  resolved "https://registry.yarnpkg.com/ts-gb/-/ts-gb-0.5.1.tgz#570465c3b74516a6514df9c1b0c134bf56df6101"
 
 ts-loader@3:
   version "3.5.0"
