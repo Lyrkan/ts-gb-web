@@ -202,7 +202,7 @@ const gameLoop = (loopTime: number) => {
     // the previous frame took to process.
     const ticks = Math.min(
       (CPU_CLOCK_FREQUENCY * deltaLoopTime) / 1000,
-      CPU_CLOCK_FREQUENCY
+      CPU_CLOCK_FREQUENCY / 30
     );
 
     try {
