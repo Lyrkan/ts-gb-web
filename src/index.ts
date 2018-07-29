@@ -1,13 +1,13 @@
 import 'babel-polyfill';
 import { System } from 'ts-gb/dist/system';
-import { SCREEN_WIDTH, SCREEN_HEIGHT } from 'ts-gb/dist/display/display';
+import { CanvasRenderer } from 'ts-gb/dist/display/renderers/canvas-renderer';
+import { WebGLRenderer } from 'ts-gb/dist/display/renderers/webgl-renderer';
 import { BUTTON } from 'ts-gb/dist/controls/joypad';
 import { Database } from './database';
 import * as Alerts from './alerts';
 
 const WINDOW_SCALING = 3;
 const CPU_CLOCK_FREQUENCY = 1024 * 1024;
-const COLOR_OFF_SCREEN = '#EEEEEE';
 
 // ------
 // Initialize all components
@@ -15,21 +15,25 @@ const COLOR_OFF_SCREEN = '#EEEEEE';
 const system = new System();
 
 // ------
-// Initialize canvas options
+// Create Canvas or WebGL renderer
 // ------
-const canvas = document.getElementById('lcd');
-const canvasContext = canvas ? (canvas as HTMLCanvasElement).getContext('2d') : null;
-if (!canvas || !canvasContext) {
-  throw new Error('Could not find LCD canvas');
-}
+const webGLSupport = (() => {
+  try {
+    return !!document.createElement('canvas').getContext('webgl');
+  } catch (e) {
+    return false;
+  }
+})();
 
-canvas.style.width = `${SCREEN_WIDTH * WINDOW_SCALING}px` ;
-canvas.style.height = `${SCREEN_HEIGHT * WINDOW_SCALING}px` ;
-canvasContext.canvas.width = SCREEN_WIDTH * WINDOW_SCALING;
-canvasContext.canvas.height = SCREEN_HEIGHT * WINDOW_SCALING;
-canvasContext.imageSmoothingEnabled = false;
-canvasContext.fillStyle = COLOR_OFF_SCREEN;
-canvasContext.fillRect(0, 0, SCREEN_WIDTH * WINDOW_SCALING, SCREEN_HEIGHT * WINDOW_SCALING);
+const rendererOptions = { scaling: WINDOW_SCALING, canvasId: 'lcd' };
+const renderer = webGLSupport ?
+  new WebGLRenderer(system.display, rendererOptions) :
+  new CanvasRenderer(system.display, rendererOptions);
+
+const lcdContainer = document.getElementById('lcd-container');
+if (lcdContainer) {
+  lcdContainer.appendChild(renderer.getCanvas());
+}
 
 // ------
 // Status flags
@@ -187,10 +191,7 @@ window.addEventListener('keyup', event => {
 // ------
 // Game loop
 // ------
-const imageDataBuffer = new Uint8ClampedArray(4 * SCREEN_WIDTH * SCREEN_HEIGHT);
-const imageData = new ImageData(imageDataBuffer, SCREEN_WIDTH, SCREEN_HEIGHT);
 let lastLoopTime: number|null = null;
-
 const gameLoop = (loopTime: number) => {
   let deltaLoopTime: number|null = null;
   if (lastLoopTime != null) {
@@ -218,28 +219,7 @@ const gameLoop = (loopTime: number) => {
   }
 
   if (gameRomLoaded) {
-    // Draw buffer
-    const buffer = system.display.getFrontBuffer();
-
-    for (let line = 0; line < SCREEN_HEIGHT; line++) {
-      for (let column = 0; column < SCREEN_WIDTH; column++) {
-        const startIndex = (line * SCREEN_WIDTH * 4) + (column * 4);
-        imageDataBuffer[startIndex] = buffer[(line * SCREEN_WIDTH * 3) + (column * 3)];
-        imageDataBuffer[startIndex + 1] = buffer[(line * SCREEN_WIDTH * 3) + (column * 3) + 1];
-        imageDataBuffer[startIndex + 2] = buffer[(line * SCREEN_WIDTH * 3) + (column * 3) + 2];
-        imageDataBuffer[startIndex + 3] = 255;
-      }
-    }
-
-    createImageBitmap(imageData).then(bitmap => {
-      canvasContext.drawImage(
-        bitmap,
-        0,
-        0,
-        SCREEN_WIDTH * WINDOW_SCALING,
-        SCREEN_HEIGHT * WINDOW_SCALING
-      );
-    });
+    renderer.renderFrame();
   }
 
   // Prepare for new frame
