@@ -1,10 +1,9 @@
 const Encore = require('@symfony/webpack-encore');
-const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin')
-const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
 const FaviconsWebpackPlugin = require('favicons-webpack-plugin')
 
 Encore
+  .disableSingleRuntimeChunk()
   .setOutputPath('build/')
   .setPublicPath('/')
   .cleanupOutputBeforeBuild()
@@ -17,19 +16,5 @@ Encore
   .addPlugin(new FaviconsWebpackPlugin('./assets/favicon.png'))
 ;
 
-const webpackConfig = Encore.getWebpackConfig();
-
-// Remove the old version first
-webpackConfig.plugins = webpackConfig.plugins.map((plugin) => {
-  if (plugin instanceof webpack.optimize.UglifyJsPlugin) {
-    return new UglifyJsPlugin();
-  }
-
-  return plugin;
-});
-
-// Add the new one
-webpackConfig.plugins.push(new UglifyJsPlugin());
-
 // export the final configuration
-module.exports = webpackConfig;
+module.exports = Encore.getWebpackConfig();
