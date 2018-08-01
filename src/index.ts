@@ -2,6 +2,7 @@ import 'babel-polyfill';
 import { System } from 'ts-gb/dist/system';
 import { CanvasRenderer } from 'ts-gb/dist/display/renderers/canvas-renderer';
 import { WebGLRenderer } from 'ts-gb/dist/display/renderers/webgl-renderer';
+import { TonejsRenderer } from 'ts-gb/dist/audio/renderers/tonejs-renderer';
 import { BUTTON } from 'ts-gb/dist/controls/joypad';
 import { Database } from './database';
 import * as Alerts from './alerts';
@@ -34,6 +35,12 @@ const lcdContainer = document.getElementById('lcd-container');
 if (lcdContainer) {
   lcdContainer.appendChild(renderer.getCanvas());
 }
+
+// ------
+// Add Tone.js audio renderer
+// ------
+const audioRenderer = new TonejsRenderer(system.audio);
+system.audio.setEventListener(audioRenderer);
 
 // ------
 // Status flags
@@ -155,6 +162,15 @@ const setEmulationPaused = (paused: boolean) => {
   }
 };
 
+const setMuted = (muted: boolean) => {
+  audioRenderer.setVolume(muted ? -Infinity : 0);
+
+  const controlsElt = document.getElementById('lcd-controls');
+  if (controlsElt) {
+    controlsElt.classList.toggle('state-muted', muted);
+  }
+};
+
 const playButton = document.querySelector('#lcd-controls .play-button');
 if (playButton) {
   playButton.addEventListener('click', () => setEmulationPaused(false));
@@ -163,6 +179,16 @@ if (playButton) {
 const pauseButton = document.querySelector('#lcd-controls .pause-button');
 if (pauseButton) {
   pauseButton.addEventListener('click', () => setEmulationPaused(true));
+}
+
+const muteButton = document.querySelector('#lcd-controls .mute-button');
+if (muteButton) {
+  muteButton.addEventListener('click', () => setMuted(true));
+}
+
+const unmuteButton = document.querySelector('#lcd-controls .unmute-button');
+if (unmuteButton) {
+  unmuteButton.addEventListener('click', () => setMuted(false));
 }
 
 const keyMap: { [index: number]: BUTTON } = {

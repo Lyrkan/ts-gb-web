@@ -72,34 +72,43 @@ h1 {
     background: linear-gradient(to top, rgba(0,0,0,0.65) 0%,rgba(0,0,0,0) 100%);
 
     .control-button {
-      display: inline-block;
-      vertical-align: middle;
+      position: absolute;
+      display: block;
+      top: 18px;
+      height: 16px;
+      width: 16px;
+      background: url('../assets/controls.png');
+      background-size: 32px 32px;
       cursor: pointer;
-      border-color: rgba(255, 255, 255, 0.8);
-
-      &:hover {
-        border-color: #fff;
-      }
     }
 
-    .play-button, .play-button:hover {
+    .play-button, .pause-button {
+      left: 20px;
+    }
+
+    .mute-button, .unmute-button {
+      right: 20px;
+    }
+
+    .play-button {
+      background-position: 0 -16px;
+    }
+
+    .pause-button {
+      background-position: -16px -16px;
+    }
+
+    .mute-button {
+      background-position: -16px 0;
+    }
+
+    .unmute-button {
       display: none;
-      width: 0;
-      height: 0;
-      border-top: 6px solid transparent;
-      border-bottom: 6px solid transparent;
-      border-left-width: 9px;
-      border-left-style: solid;
-      margin-left: 3px;
+      background-position: 0 0;
     }
 
-    .pause-button, .pause-button:hover {
-      width: 3px;
-      height: 11px;
-      border-right-width: 3px;
-      border-right-style: solid;
-      border-left-width: 3px;
-      border-left-style: solid;
+    .play-button, .unmute-button {
+      display: none;
     }
 
     &.state-paused {
@@ -109,6 +118,16 @@ h1 {
 
       .pause-button {
         display: none;
+      }
+    }
+
+    &.state-muted {
+      .mute-button {
+        display: none;
+      }
+
+      .unmute-button {
+        display: inline-block;
       }
     }
   }
