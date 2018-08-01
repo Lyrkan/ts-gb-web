@@ -41,6 +41,7 @@ if (lcdContainer) {
 // ------
 const audioRenderer = new TonejsRenderer(system.audio);
 system.audio.setEventListener(audioRenderer);
+audioRenderer.setVolume(-18);
 
 // ------
 // Status flags
