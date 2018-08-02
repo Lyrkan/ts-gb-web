@@ -9,6 +9,7 @@ import * as Alerts from './alerts';
 
 const WINDOW_SCALING = 3;
 const CPU_CLOCK_FREQUENCY = 1024 * 1024;
+const DEFAULT_VOLUME = -18;
 
 // ------
 // Initialize all components
@@ -41,7 +42,7 @@ if (lcdContainer) {
 // ------
 const audioRenderer = new TonejsRenderer(system.audio);
 system.audio.setEventListener(audioRenderer);
-audioRenderer.setVolume(-18);
+audioRenderer.setVolume(DEFAULT_VOLUME);
 
 // ------
 // Status flags
@@ -164,7 +165,7 @@ const setEmulationPaused = (paused: boolean) => {
 };
 
 const setMuted = (muted: boolean) => {
-  audioRenderer.setVolume(muted ? -Infinity : 0);
+  audioRenderer.setVolume(muted ? -Infinity : DEFAULT_VOLUME);
 
   const controlsElt = document.getElementById('lcd-controls');
   if (controlsElt) {
@@ -214,6 +215,14 @@ window.addEventListener('keyup', event => {
     system.joypad.up(keyMap[event.keyCode]);
   }
 });
+
+// ------
+// Detect page visibility changes to avoid the audio
+// glitching out when switching tab.
+// ------
+if (typeof document.hidden !== 'undefined') {
+  document.addEventListener('visibilitychange', () => setMuted(document.hidden), false);
+}
 
 // ------
 // Game loop
