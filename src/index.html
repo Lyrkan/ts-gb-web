@@ -11,10 +11,16 @@
       <div id="lcd-container">
         <div id="lcd-stats"></div>
         <div id="lcd-controls">
-          <div class="control-button play-button"></div>
-          <div class="control-button pause-button"></div>
-          <div class="control-button unmute-button"></div>
-          <div class="control-button mute-button"></div>
+          <div class="playback-controls">
+            <div class="control control-button play-button"></div>
+            <div class="control control-button pause-button"></div>
+          </div>
+
+          <div class="volume-controls">
+            <div class="control control-button unmute-button"></div>
+            <div class="control control-button mute-button"></div>
+            <input type="range" class="control volume-slider" min="0" max="100" value="50">
+          </div>
         </div>
       </div>
 

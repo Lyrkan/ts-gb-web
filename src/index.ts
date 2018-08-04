@@ -9,7 +9,7 @@ import * as Alerts from './alerts';
 
 const WINDOW_SCALING = 3;
 const CPU_CLOCK_FREQUENCY = 1024 * 1024;
-const DEFAULT_VOLUME = -18;
+const DEFAULT_VOLUME = 50;
 
 // ------
 // Initialize all components
@@ -106,6 +106,7 @@ const createFileSelectListener = (type: string) => (event: Event) => {
         case 'rom':
           loadGame(file.name, fileData).then(() => {
             gameRomLoaded = true;
+            document.body.classList.toggle('game-loaded', true);
             setEmulationPaused(false);
             Alerts.displayToast(`ROM has been loaded successfuly: <strong>${file.name}</strong>`);
           }).catch(error => {
@@ -164,12 +165,19 @@ const setEmulationPaused = (paused: boolean) => {
   }
 };
 
-const setMuted = (muted: boolean) => {
-  audioRenderer.setVolume(muted ? -Infinity : DEFAULT_VOLUME);
+const setVolume = (volume: number) => {
+  audioRenderer.setVolume(volume);
 
+  // Update slider
+  const slider = document.querySelector('#lcd-controls .volume-slider') as HTMLInputElement;
+  if (slider) {
+    slider.value = '' + volume;
+  }
+
+  // Update Mute/Unmute buttons
   const controlsElt = document.getElementById('lcd-controls');
   if (controlsElt) {
-    controlsElt.classList.toggle('state-muted', muted);
+    controlsElt.classList.toggle('state-muted', (volume === 0));
   }
 };
 
@@ -183,14 +191,27 @@ if (pauseButton) {
   pauseButton.addEventListener('click', () => setEmulationPaused(true));
 }
 
+let volumeBeforeMuted = DEFAULT_VOLUME;
 const muteButton = document.querySelector('#lcd-controls .mute-button');
 if (muteButton) {
-  muteButton.addEventListener('click', () => setMuted(true));
+  muteButton.addEventListener('click', () => {
+    volumeBeforeMuted = audioRenderer.getVolume();
+    setVolume(0);
+  });
 }
 
 const unmuteButton = document.querySelector('#lcd-controls .unmute-button');
 if (unmuteButton) {
-  unmuteButton.addEventListener('click', () => setMuted(false));
+  unmuteButton.addEventListener('click', () => {
+    setVolume(volumeBeforeMuted);
+  });
+}
+
+const volumeSlider = document.querySelector('#lcd-controls .volume-slider') as HTMLInputElement;
+if (volumeSlider) {
+  volumeSlider.addEventListener('change', () => {
+    setVolume(parseInt(volumeSlider.value, 10));
+  });
 }
 
 const keyMap: { [index: number]: BUTTON } = {
@@ -221,7 +242,19 @@ window.addEventListener('keyup', event => {
 // glitching out when switching tab.
 // ------
 if (typeof document.hidden !== 'undefined') {
-  document.addEventListener('visibilitychange', () => setMuted(document.hidden), false);
+  let volumeWhenHidden = 0;
+  document.addEventListener(
+    'visibilitychange',
+    () => {
+      if (document.hidden) {
+        volumeWhenHidden = audioRenderer.getVolume();
+        audioRenderer.setVolume(0);
+      } else {
+        audioRenderer.setVolume(volumeWhenHidden);
+      }
+    },
+    false
+  );
 }
 
 // ------
