@@ -257,6 +257,12 @@ if (typeof document.hidden !== 'undefined') {
   );
 }
 
+// Allows to fix a small background transition issue.
+// See stylesheet for more info.
+document.addEventListener('DOMContentLoaded', () => {
+  document.body.classList.add('dom-loaded');
+});
+
 // ------
 // Game loop
 // ------

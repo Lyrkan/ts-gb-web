@@ -10,7 +10,13 @@ body {
   color: #eee;
   font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
   font-size: 12px;
-  transition: background 3s ease-out;
+
+  // Fix a strange bug in Chrome where
+  // the background could start white and
+  // progressively get its color.
+  &.dom-loaded {
+    transition: background-color 3s ease-out;
+  }
 
   &.game-loaded {
     background: #0d0c13;
