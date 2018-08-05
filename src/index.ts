@@ -55,11 +55,11 @@ let emulationPaused = false;
 // ------
 const database = new Database();
 
-const loadBootRom = async (buffer: ArrayBuffer) => {
+async function loadBootRom(buffer: ArrayBuffer) {
   system.loadBootRom(buffer);
-};
+}
 
-const loadGame = async (filename: string, buffer: ArrayBuffer) => {
+async function loadGame(filename: string, buffer: ArrayBuffer) {
   system.loadGame(buffer);
 
   if (system.cartridge.cartridgeInfo.hasBattery) {
@@ -86,40 +86,42 @@ const loadGame = async (filename: string, buffer: ArrayBuffer) => {
       console.error(e); // tslint:disable-line:no-console
     }
   }
-};
+}
 
-const createFileSelectListener = (type: string) => (event: Event) => {
-  const files =  (event.target as HTMLInputElement).files;
-  if (files && files[0]) {
-    const reader = new FileReader();
-    reader.onload = ((file: File) => (e: any) => {
-      const fileData = e.target.result;
-      switch (type) {
-        case 'bootrom':
-          loadBootRom(fileData).then(() => {
-            Alerts.displayToast('Bootstrap ROM has been loaded successfuly');
-          }).catch(error => {
-            Alerts.displayError(`Could not load ROM <strong>${file.name}</strong>:<br>${error}`);
-            console.error(error); // tslint:disable-line:no-console
-          });
-          break;
-        case 'rom':
-          loadGame(file.name, fileData).then(() => {
-            gameRomLoaded = true;
-            document.body.classList.toggle('game-loaded', true);
-            setEmulationPaused(false);
-            Alerts.displayToast(`ROM has been loaded successfuly: <strong>${file.name}</strong>`);
-          }).catch(error => {
-            Alerts.displayError(`Could not load game <strong>${file.name}</strong>:<br>${error}`);
-            console.error(error); // tslint:disable-line:no-console
-          });
-          break;
-      }
-    })(files[0]);
+function createFileSelectListener(type: string) {
+  return async (event: Event) => {
+    const files =  (event.target as HTMLInputElement).files;
+    if (files && files[0]) {
+      const reader = new FileReader();
+      reader.onload = ((file: File) => (e: any) => {
+        const fileData = e.target.result;
+        switch (type) {
+          case 'bootrom':
+            loadBootRom(fileData).then(() => {
+              Alerts.displayToast('Bootstrap ROM has been loaded successfuly');
+            }).catch(error => {
+              Alerts.displayError(`Could not load ROM <strong>${file.name}</strong>:<br>${error}`);
+              console.error(error); // tslint:disable-line:no-console
+            });
+            break;
+          case 'rom':
+            loadGame(file.name, fileData).then(() => {
+              gameRomLoaded = true;
+              document.body.classList.toggle('game-loaded', true);
+              setEmulationPaused(false);
+              Alerts.displayToast(`ROM has been loaded successfuly: <strong>${file.name}</strong>`);
+            }).catch(error => {
+              Alerts.displayError(`Could not load game <strong>${file.name}</strong>:<br>${error}`);
+              console.error(error); // tslint:disable-line:no-console
+            });
+            break;
+        }
+      })(files[0]);
 
-    reader.readAsArrayBuffer(files[0]);
-  }
-};
+      reader.readAsArrayBuffer(files[0]);
+    }
+  };
+}
 
 const loadBootromBtn = document.getElementById('load-bootrom-btn');
 if (loadBootromBtn !== null) {
@@ -156,16 +158,16 @@ if (statsElement) {
 // ------
 // Controls
 // ------
-const setEmulationPaused = (paused: boolean) => {
+function setEmulationPaused(paused: boolean) {
   emulationPaused = paused;
 
   const controlsElt = document.getElementById('lcd-controls');
   if (controlsElt) {
     controlsElt.classList.toggle('state-paused', emulationPaused);
   }
-};
+}
 
-const setVolume = (volume: number) => {
+function setVolume(volume: number) {
   audioRenderer.setVolume(volume);
 
   // Update slider
@@ -179,7 +181,7 @@ const setVolume = (volume: number) => {
   if (controlsElt) {
     controlsElt.classList.toggle('state-muted', (volume === 0));
   }
-};
+}
 
 const playButton = document.querySelector('#lcd-controls .play-button');
 if (playButton) {
