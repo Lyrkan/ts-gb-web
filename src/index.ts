@@ -89,7 +89,7 @@ async function loadGame(filename: string, buffer: ArrayBuffer) {
 }
 
 function createFileSelectListener(type: string) {
-  return async (event: Event) => {
+  return (event: Event) => {
     const files =  (event.target as HTMLInputElement).files;
     if (files && files[0]) {
       const reader = new FileReader();
