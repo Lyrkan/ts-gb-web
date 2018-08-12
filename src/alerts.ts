@@ -1,21 +1,33 @@
-import Swal from 'sweetalert2';
+const errorContainer = document.getElementById('error');
+const toastsContainer = document.getElementById('toasts');
+
+if (errorContainer) {
+  const closeButton = errorContainer.getElementsByClassName('close-button');
+  if (closeButton.length > 0) {
+    closeButton[0].addEventListener('click', () => {
+      errorContainer.classList.remove('show');
+    });
+  }
+}
 
 export const displayError = (message: string) => {
-  Swal({
-    type: 'error',
-    title: 'Oops!',
-    html: `An error occured:\n${message}`,
-    // tslint:disable-next-line
-    footer: '<a href="https://github.com/Lyrkan/ts-gb/issues" target="_blank">Open an issue on Github</a>'
-  });
+  if (errorContainer) {
+    errorContainer.classList.toggle('show', true);
+
+    const messageDiv = errorContainer.getElementsByClassName('error-message');
+    if (messageDiv.length > 0) {
+      messageDiv[0].innerHTML = message;
+    }
+  }
 };
 
 export const displayToast = (message: string) => {
-  Swal({
-    type: 'info',
-    toast: true,
-    position: 'top-end',
-    html: message,
-    timer: 3000,
-  });
+  if (toastsContainer) {
+    const toastElement = document.createElement('div');
+    toastElement.classList.add('toast');
+    toastElement.innerHTML = message;
+
+    toastsContainer.appendChild(toastElement);
+    setTimeout(() => { toastElement.remove(); }, 4000);
+  }
 };

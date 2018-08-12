@@ -293,14 +293,105 @@ h1 {
   background-size: 32px 32px;
 }
 
-.swal2-container a {
-  text-decoration: none;
-  color: #2196f3;
-  font-weight: 600;
-  cursor: pointer;
+#error {
+  display: none;
+  position: fixed;
+  z-index: 999;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(0, 0, 0, 0.4);
+  color: #333;
+
+  &.show {
+    display: block;
+  }
+
+  .error-inner {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translateX(-50%) translateY(-50%);
+    max-width: 450px;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 2px 2px 2px;
+
+    a {
+      font-weight: bold;
+      color: #7472b9;
+      text-decoration: none;
+    }
+  }
+
+  .error-title, .error-message, .error-footer {
+    padding: 10px;
+  }
+
+  .error-title {
+    position: relative;
+    font-size: 18px;
+    font-weight: bold;
+    border-bottom: 1px solid #ccc;
+
+    .close-button {
+      position: absolute;
+      top: 50%;
+      right: 10px;
+      width: 16px;
+      height: 16px;
+      transform: translateY(-50%);
+      cursor: pointer;
+
+      &::before, &::after {
+        position: absolute;
+        display: block;
+        content: '';
+        top: 7px;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: #333;
+      }
+
+      &::before {
+        transform: rotate(-45deg);
+      }
+
+      &::after {
+        transform: rotate(45deg);
+      }
+    }
+  }
+
+  .error-message {
+    border-bottom: 1px solid #ccc;
+  }
 }
 
-.swal2-popup.swal2-toast.swal2-show {
-  background: rgba(255, 255, 255, 0.9);
-  box-shadow: none;
+#toasts {
+  position: fixed;
+  z-index: 999;
+  top: 0;
+  right: 0;
+  width: auto;
+  max-width: 600px;
+  color: #333;
+
+  .toast {
+    margin: 10px;
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 10px;
+
+    &:not(:first-child) {
+      margin-top: 10px;
+    }
+
+    .toast-title {
+      font-weight: bold;
+      margin-right: 10px;
+    }
+  }
 }
