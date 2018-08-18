@@ -9,7 +9,10 @@
       <div id="logo"></div>
 
       <div id="lcd-container">
-        <div id="lcd-stats"></div>
+        <div id="top-indicators">
+          <span id="lcd-stats"></span>
+          <span id="ts-gb-version">v<%= require('ts-gb/package.json').version %></span>
+        </div>
         <div id="lcd-controls">
           <div class="playback-controls">
             <div class="control control-button play-button"></div>
