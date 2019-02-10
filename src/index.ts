@@ -1,4 +1,5 @@
-import 'babel-polyfill';
+import '@babel/polyfill';
+
 import { System } from 'ts-gb/dist/system';
 import { CanvasRenderer } from 'ts-gb/dist/display/renderers/canvas-renderer';
 import { WebGLRenderer } from 'ts-gb/dist/display/renderers/webgl-renderer';
@@ -6,6 +7,8 @@ import { TonejsRenderer } from 'ts-gb/dist/audio/renderers/tonejs-renderer';
 import { BUTTON } from 'ts-gb/dist/controls/joypad';
 import { Database } from './database';
 import * as Alerts from './alerts';
+
+import './index.scss';
 
 const WINDOW_SCALING = 3;
 const CPU_CLOCK_FREQUENCY = 1024 * 1024;
@@ -92,7 +95,7 @@ async function loadGame(filename: string, buffer: ArrayBuffer) {
   }
 }
 
-function createFileSelectListener(type: string) {
+function createFileSelectListener(type: 'bootrom'|'rom') {
   return (event: Event) => {
     const files =  (event.target as HTMLInputElement).files;
     if (files && files[0]) {

@@ -1,6 +1,6 @@
 const Encore = require('@symfony/webpack-encore');
 const HtmlWebpackPlugin = require('html-webpack-plugin')
-const FaviconsWebpackPlugin = require('favicons-webpack-plugin')
+const WebappWebpackPlugin = require('webapp-webpack-plugin');
 
 Encore
   .disableSingleRuntimeChunk()
@@ -8,12 +8,14 @@ Encore
   .setPublicPath('/')
   .cleanupOutputBeforeBuild()
   .addEntry('main', './src/index.ts')
-  .addStyleEntry('style', './src/index.scss')
   .enableSassLoader()
   .enableTypeScriptLoader()
   .enableVersioning()
   .addPlugin(new HtmlWebpackPlugin({ template: 'src/index.html'}))
-  .addPlugin(new FaviconsWebpackPlugin('./assets/favicon.png'))
+  .addPlugin(new WebappWebpackPlugin('./assets/favicon.png'))
+  .configureBabel(options => {
+    options.sourceType = 'unambiguous';
+  })
 ;
 
 // export the final configuration
