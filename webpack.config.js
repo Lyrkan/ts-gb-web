@@ -8,9 +8,11 @@ Encore
   .setPublicPath('/')
   .cleanupOutputBeforeBuild()
   .addEntry('main', './src/index.ts')
-  .enableSassLoader()
+  .enableSassLoader(options => {
+    options.implementation = require('sass');
+  })
   .enableTypeScriptLoader()
-  .enableVersioning()
+  .enableVersioning(Encore.isProduction())
   .addPlugin(new HtmlWebpackPlugin({ template: 'src/index.html'}))
   .addPlugin(new WebappWebpackPlugin('./assets/favicon.png'))
   .configureBabel(options => {

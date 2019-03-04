@@ -14,11 +14,11 @@
     "prepush": "yarn audit && yarn run lint"
   },
   "devDependencies": {
-    "@symfony/webpack-encore": "^0.23.0",
+    "@symfony/webpack-encore": "^0.24.0",
     "html-webpack-plugin": "^3.2.0",
     "husky": "^0.14.3",
-    "node-sass": "^4.11.0",
     "rimraf": "^2.6.2",
+    "sass": "^1.17.2",
     "sass-loader": "^7.1.0",
     "ts-loader": "^5.3.3",
     "tslint": "^5.12.1",
