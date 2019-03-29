@@ -1,5 +1,3 @@
-import '@babel/polyfill';
-
 import { System } from 'ts-gb/dist/system';
 import { CanvasRenderer } from 'ts-gb/dist/display/renderers/canvas-renderer';
 import { WebGLRenderer } from 'ts-gb/dist/display/renderers/webgl-renderer';

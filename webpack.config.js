@@ -15,8 +15,10 @@ Encore
   .enableVersioning(Encore.isProduction())
   .addPlugin(new HtmlWebpackPlugin({ template: 'src/index.html'}))
   .addPlugin(new WebappWebpackPlugin('./assets/favicon.png'))
-  .configureBabel(options => {
-    options.sourceType = 'unambiguous';
+  .configureBabel(options => { options.sourceType = 'unambiguous'; }, {
+    useBuiltIns: 'usage',
+    corejs: 3,
+    includeNodeModules: ['ts-gb'],
   })
 ;
 
