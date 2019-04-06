@@ -18,7 +18,7 @@ const DEFAULT_VOLUME = 50;
 const system = new System();
 
 // Expose system globally to allow debugging
-// the console.
+// from the console.
 (window as any).GAME_BOY = system;
 
 // ------
